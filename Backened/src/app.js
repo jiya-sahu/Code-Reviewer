@@ -5,7 +5,9 @@ const app = express()
 
 app.use(express.json())
 app.use(cors({
+
   origin: 'https://auto-review.netlify.app',
+
   methods: ['POST'],
   credentials: true
 }));
