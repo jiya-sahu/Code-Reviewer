@@ -24,7 +24,7 @@ function App() {
     setLoading(true); // Start loading
     try {
       const response = await axios.post(
-        'http://localhost:3001/ai/get-review',
+      `${import.meta.env.VITE_API_BASE_URL}/ai/get-review`,
         { code }
       );
       setReview(response.data);
