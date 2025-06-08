@@ -7,20 +7,32 @@ import Markdown from "react-markdown"
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import axios from 'axios'
+import ClipLoader from "react-spinners/ClipLoader";
 function App() {
   const [code , setCode] = useState(` function sum() {
     return 1+1
   }`);
 
   const [review , setReview] = useState("");
+    const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     prism.highlightAll();
   }, []);
 
  async function reviewCode() {
-   const response = await  axios.post('http://localhost:3001/ai/get-review',{code})
-   setReview(response.data)
+    setLoading(true); // Start loading
+    try {
+      const response = await axios.post(
+        'http://localhost:3001/ai/get-review',
+        { code }
+      );
+      setReview(response.data);
+    } catch (err) {
+      setReview("❌ Failed to fetch review. Please try again.");
+      console.error(err);
+    }
+    setLoading(false); // Stop loading
   }
 
   return (
@@ -43,13 +55,17 @@ function App() {
               }}
             />
           </div>
-          <div className="review" onClick={reviewCode}>Review</div>
+          <div className="review" onClick={reviewCode}> {loading ? <ClipLoader size={20} color="#fff" /> : "Review"}</div>
         </div>
         <div className="right">
-          <Markdown
-          rehypePlugins={[ rehypeHighlight ]}>
-             {review}
-          </Markdown>
+          {loading ? (
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            <ClipLoader size={40} />
+            <p>Analyzing code, please wait...</p>
+          </div>
+        ) : (
+          <Markdown rehypePlugins={[rehypeHighlight]}>{review}</Markdown>
+        )}
          </div>
       </div>
     </>
